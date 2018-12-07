@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <title>Welcome!</title>
+</head>
+<body>
+    <h1 class="jumbotron">Dojo Chat</h1>
+    <nav class="navbar navbar-dark bg-dark gr">
+        <h3>Coding Dojo Chat</h3>
+        <h4>Hi, {{ name[0]['first_name'] }}</h4>
+        <a class="btn btn-dark d" href="/logout">Log out</a>
+    </nav>
+    <h2 id="a">Welcome to your wall, {{ name[0]['first_name'] }}!</h2>
+    <div class="main">
+        <div class="container z">
+            <h2>Your chats</h2>
+            <table class="table table-light table-striped table-bordered overflow">
+                <thead>
+                    <tr>
+                        <th colspan=4>Inbox ({{received_messages|count}})</th>
+                    </tr>
+                    <tr>
+                        <th>From</th>
+                        <th>Message</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for message in received_messages: %}
+                    <tr>
+                        <td class="table-name">{{ message['first_name'] }} {{ message['last_name'] }}</td>
+                        <td class="table-message">{{ message['content'] }}</td>
+                        <td class="table-date">{{ message['created_at'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table><br>
+            <table class="table table-light table-striped table-bordered overflow">
+                <thead>
+                    <tr>
+                        <th colspan=4>Sent Messages ({{sent_messages|count}})</th>
+                    </tr>
+                    <tr>
+                        <th>To</th>
+                        <th>Message</th>
+                        <th>Date</th>
+                        <th class="remove">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for message in sent_messages: %}
+                    <tr>
+                        <td class="table-name">{{message['first_name']}} {{message['last_name'] }}</td>
+                        <td class="table-message">{{message['content']}}</td>
+                        <td class="table-date">{{message['created_at'] }}</td>
+                        <td class="remove"><a href="/delete_message/{{message['id']}}">Delete</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="container">
+            <h2>Compose</h2>
+            <form action="/send_message" method="POST">
+                <h6 class="recipient">Write to:
+                    <select name="recipient" class="form-control form-control-sm">
+                        <option value="default">Choose a friend</option>
+                        {% for user in list %}
+                        <option value="{{user['id']}}">{{ user['first_name'] + ' ' + user['last_name'] }}</option>
+                        {% endfor %}
+                    </select>
+                </h6>
+                <textarea name="message" class="form-control f e" placeholder="Write a message!" rows="6"></textarea>
+                <input type="submit" class="btn btn-dark f" value="Send message!">
+            </form>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="error">
+                        <p class="fail">{{message}}</p>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>     
+</body>
+</html>
